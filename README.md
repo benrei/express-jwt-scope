@@ -17,8 +17,6 @@ Use together with [express-jwt](https://github.com/auth0/express-jwt) to validat
 
 #### Example 1
 ```javascript
-const express = require('express');
-const app = express();
 const jwt = require('express-jwt');
 const jwtScope = require('express-jwt-scope');
 
@@ -36,8 +34,6 @@ let user = { scope: 'read:users' };
 Allow if any of `scope`, looks like this:
 
 ```javascript
-const express = require('express');
-const app = express();
 const jwt = require('express-jwt');
 const jwtScope = require('express-jwt-scope');
 //  Validates JWT and sets req.user
@@ -68,8 +64,6 @@ const unauthorizedUser = { scope: 'read:users' };
 
 ### Custom usage
 ```javascript
-const express = require('express');
-const app = express();
 const jwt = require('express-jwt');
 const jwtScope = require('express-jwt-scope');
 
@@ -114,7 +108,7 @@ jwtScope(["write:users", "read:users"])
     -   Default value: `false`
     
 ##  Examples
-### Auth0
+### Full Auth0
 ```js
 const express = require('express');
 const app = express();
