@@ -29,34 +29,50 @@ app.get('/users',
 Allow if any of `scope`, looks like this:
 
 ```javascript
-app.post('/users',
-  jwt({ secret: 'shared_secret' }),
-  jwtScope('read:users write:users'),
-  function(req, res) { ... });
+app.use(jwt({ secret: 'shared_secret'}));
+
+app.get('/users', jwtScope('read:users write:users'), (req, res)=> {
+  //  Do stuff...
+});
 
 // This user will have access
-let user = {
-  scope: 'read:users'
-};
+let user = { scope: 'read:users' };
 ```
 
 To require that all scopes are provided, use the `requireAll: true` option:
 
 ```javascript
-app.post('/users',
-  jwt({ secret: 'shared_secret' }),
-  jwtScope('read:users write:users', { requireAll: true }),
-  function(req, res) { ... });
+let options = { requireAll: true };
+app.post('/users', jwtScope('read:users write:users', options), (req, res)=> {
+  //  Do stuff...
+});
 
 // This user will have access
-const authorizedUser = {
-  scope: 'read:users write:users'
-};
+const authorizedUser = { scope: 'read:users write:users' };
 
 // This user will NOT have access
-const unauthorizedUser = {
-  scope: 'read:users'
-};
+const unauthorizedUser = { scope: 'read:users' };
+```
+
+### Custom usage
+```javascript
+const jwt = require('express-jwt');
+const jwtScope = require('express-jwt-scope');
+
+app.use(jwt({ secret: 'shared_secret'}));
+
+//  Checks req.user['permission']
+const checkPermissions = (permissions)=> jwtScope(permissions, { scopeKey : 'permissions', requireAll: true });
+//  Checks req.user['yourScope']
+const checkYourScope = (yourScope)=> jwtScope(yourScope, { scopeKey : 'yourScope' });
+
+app.post('/users', checkPermissions('write:users read:users'), (req, res)=> {
+  //  Do stuff...
+});
+
+app.get('/yourPath', checkYourScope('your:scope'), (req, res)=> {
+  res.json({message: 'Hello from /yourPath!'});
+});
 ```
 
 ### Input types
@@ -96,8 +112,7 @@ const jwtScope = require('express-jwt-scope');
 // Access Token must exist and be verified against
 // the Auth0 JSON Web Key Set
 const checkJwt = jwt({
-  // Dynamically provide a signing key
-  // based on the kid in the header and 
+  // Dynamically provide a signing key based on the kid in the header and 
   // the signing keys provided by the JWKS endpoint.
   secret: jwksRsa.expressJwtSecret({
     cache: true,
@@ -114,23 +129,23 @@ const checkJwt = jwt({
 
 /**  Public routes goes here  */
 // This route doesn't need authentication
-app.get('/api/public', function(req, res) {
+app.get('/api/public', (req, res)=> {
   res.json({message: 'Hello from a public endpoint! You don\'t need to be authenticated to see this.'});
 });
 
 // This route need authentication
-app.get('/api/private', checkJwt, function(req, res) {
+app.get('/api/private', checkJwt, (req, res)=> {
   res.json({message: 'Hello from a private endpoint! You need to be authenticated to see this.'});
 });
 
 // This route need authentication and scope
-app.get('/api/private-scoped', checkJwt, jwtScope('read:messages'), function(req, res) {
+app.get('/api/private-scoped', checkJwt, jwtScope('read:messages'), (req, res)=> {
   res.json({message: 'Hello from a private endpoint! You need to be authenticated and have a req.user.scope of read:messages to see this.'});
 });
 
 /** Private routes goes here  */
 app.use(checkJwt);
-app.get('/api/another-private-scoped', jwtScope('read:info'), function(req, res) {
+app.get('/api/another-private-scoped', jwtScope('read:info'), (req, res)=> {
   res.json({message: 'Hello from a private endpoint! You need to be authenticated and have `read:info` included in req.user.scope to see this.'});
 });
 
@@ -139,7 +154,7 @@ app.get('/api/another-private-scoped', jwtScope('read:info'), function(req, res)
 let options = {
   scopeKey: 'permissions'
 };
-app.get('/api/another-private-scoped', jwtScope('read:user', options), function(req, res) {
+app.get('/api/another-private-scoped', jwtScope('read:user', options), (req, res)=> {
   res.json({message: 'Hello from a private endpoint! You need to be authenticated and have `read:user` included in req.user['permission'] to see this.'});
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "express-jwt-scope",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Middleware that checks validated JsonWebTokens (JWT) for scopes",
   "main": "index.js",
   "scripts": {
