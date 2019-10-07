@@ -15,24 +15,36 @@ Middleware that checks validated JsonWebTokens (JWT) for scopes
 
 Use together with [express-jwt](https://github.com/auth0/express-jwt) to validate JWT(JsonWebTokens) and set req.user
 
+#### Example 1
 ```javascript
+const express = require('express');
+const app = express();
 const jwt = require('express-jwt');
 const jwtScope = require('express-jwt-scope');
 
 let options = {};
 app.get('/users',
-  jwt({ secret: 'shared_secret' }),
+  jwt({ secret: 'shared_secret' }), //  Validates JWT and sets req.user
   jwtScope('read:users', options),
-  function(req, res) {...});
+  (req, res)=> res.json({message: 'Hello from /users'}));
+
+// This user will have access
+let user = { scope: 'read:users' };
 ```
 
+#### Example 2
 Allow if any of `scope`, looks like this:
 
 ```javascript
+const express = require('express');
+const app = express();
+const jwt = require('express-jwt');
+const jwtScope = require('express-jwt-scope');
+//  Validates JWT and sets req.user
 app.use(jwt({ secret: 'shared_secret'}));
 
 app.get('/users', jwtScope('read:users write:users'), (req, res)=> {
-  //  Do stuff...
+  res.json({message: 'Hello from /users'})
 });
 
 // This user will have access
@@ -56,6 +68,8 @@ const unauthorizedUser = { scope: 'read:users' };
 
 ### Custom usage
 ```javascript
+const express = require('express');
+const app = express();
 const jwt = require('express-jwt');
 const jwtScope = require('express-jwt-scope');
 
@@ -155,7 +169,7 @@ let options = {
   scopeKey: 'permissions'
 };
 app.get('/api/another-private-scoped', jwtScope('read:user', options), (req, res)=> {
-  res.json({message: 'Hello from a private endpoint! You need to be authenticated and have `read:user` included in req.user['permission'] to see this.'});
+  res.json({message: 'Hello from a private endpoint! You need to be authenticated and have `read:user` included in req.user["permission"] to see this.'});
 });
 
 ```
