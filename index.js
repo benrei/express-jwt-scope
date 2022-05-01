@@ -1,7 +1,7 @@
 /**
  * @param allowScopes {(string|Array<string>)} - Allowed or required scopes. String must be 'space' separated
  * @param options {Object} - Options
- *  - scopeKey {string} [scope] - The user property name to check for the scope. req.user[scopeKey]
+ *  - scopeKey {string} [scope] - The user property name to check for the scope. req.auth[scopeKey]
  *  - requireAll {boolean} [false] - If true: all scopes must be included. If false: at least 1
  *  - errorToNext {boolean} [false] - If true: forward errors to 'next', instead of ending the response directly
  * @returns {Function}
@@ -37,16 +37,16 @@ module.exports = (allowScopes, options = {}) => {
       return next();
     }
 
-    if (!req.user) return error(res);
+    if (!req.auth) return error(res);
 
     let userScopes = [];
     const scopeKey = options.scopeKey;
 
     //  Allow 'space' seperated string value or array value
-    if (typeof req.user[scopeKey] === 'string') {
-      userScopes = req.user[scopeKey].split(' ');
-    } else if (Array.isArray(req.user[scopeKey])) {
-      userScopes = req.user[scopeKey];
+    if (typeof req.auth[scopeKey] === 'string') {
+      userScopes = req.auth[scopeKey].split(' ');
+    } else if (Array.isArray(req.auth[scopeKey])) {
+      userScopes = req.auth[scopeKey];
     } else return error(res);
 
     let isAllowed;

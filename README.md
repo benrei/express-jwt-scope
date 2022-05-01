@@ -13,7 +13,7 @@ Middleware that checks validated JsonWebTokens (JWT) for scopes
 
 >Requires : `express-jwt`
 
-Use together with [express-jwt](https://github.com/auth0/express-jwt) to validate JWT(JsonWebTokens) and set req.user
+Use together with [express-jwt](https://github.com/auth0/express-jwt) to validate JWT(JsonWebTokens) and set req.auth
 
 #### Example 1
 ```javascript
@@ -22,7 +22,7 @@ const jwtScope = require('express-jwt-scope');
 
 let options = {};
 app.get('/users',
-  jwt({ secret: 'shared_secret' }), //  Validates JWT and sets req.user
+  jwt({ secret: 'shared_secret' }), //  Validates JWT and sets req.auth
   jwtScope('read:users', options),
   (req, res)=> res.json({message: 'Hello from /users'}));
 
@@ -36,7 +36,7 @@ Allow if any of `scope`, looks like this:
 ```javascript
 const jwt = require('express-jwt');
 const jwtScope = require('express-jwt-scope');
-//  Validates JWT and sets req.user
+//  Validates JWT and sets req.auth
 app.use(jwt({ secret: 'shared_secret'}));
 
 app.get('/users', jwtScope('read:users write:users'), (req, res)=> {
@@ -69,9 +69,9 @@ const jwtScope = require('express-jwt-scope');
 
 app.use(jwt({ secret: 'shared_secret'}));
 
-//  Checks req.user['permission']
+//  Checks req.auth['permission']
 const checkPermissions = (permissions)=> jwtScope(permissions, { scopeKey : 'permissions', requireAll: true });
-//  Checks req.user['yourScope']
+//  Checks req.auth['yourScope']
 const checkYourScope = (yourScope)=> jwtScope(yourScope, { scopeKey : 'yourScope' });
 
 app.post('/users', checkPermissions('write:users read:users'), (req, res)=> {
@@ -100,8 +100,8 @@ jwtScope(["write:users", "read:users"])
 ## Options
 
 - `scopeKey`: The user property name to check for the scope(s). 
-    -   Default value: `'scope'` => req.user['scope'].
-    -   Ex: `'permission'` => req.user['permission']
+    -   Default value: `'scope'` => req.auth['scope'].
+    -   Ex: `'permission'` => req.auth['permission']
 - `requireAll`: `true` => Requires all scopes to be provided. 
     -   Default value: `false`
 - `errorToNext`: `true` => Forward errors to express `next()`, instead of ending the response directly. 
@@ -148,13 +148,13 @@ app.get('/api/private', checkJwt, (req, res)=> {
 
 // This route need authentication and scope
 app.get('/api/private-scoped', checkJwt, jwtScope('read:messages'), (req, res)=> {
-  res.json({message: 'Hello from a private endpoint! You need to be authenticated and have a req.user.scope of read:messages to see this.'});
+  res.json({message: 'Hello from a private endpoint! You need to be authenticated and have a req.auth.scope of read:messages to see this.'});
 });
 
 /** Private routes goes here  */
 app.use(checkJwt);
 app.get('/api/another-private-scoped', jwtScope('read:info'), (req, res)=> {
-  res.json({message: 'Hello from a private endpoint! You need to be authenticated and have `read:info` included in req.user.scope to see this.'});
+  res.json({message: 'Hello from a private endpoint! You need to be authenticated and have `read:info` included in req.auth.scope to see this.'});
 });
 
 //  Enable Role-Based Access Control for APIs, to add Auth0 permissions in the access token.
@@ -163,7 +163,7 @@ let options = {
   scopeKey: 'permissions'
 };
 app.get('/api/another-private-scoped', jwtScope('read:user', options), (req, res)=> {
-  res.json({message: 'Hello from a private endpoint! You need to be authenticated and have `read:user` included in req.user["permission"] to see this.'});
+  res.json({message: 'Hello from a private endpoint! You need to be authenticated and have `read:user` included in req.auth["permission"] to see this.'});
 });
 
 ```
