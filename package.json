@@ -1,6 +1,6 @@
 {
   "name": "express-jwt-scope",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Middleware that checks validated JsonWebTokens (JWT) for scopes",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,8 @@
   "author": "Benjamin Reiersølmoen",
   "license": "MIT",
   "peerDependencies": {
-    "express": "4.x"
+    "express": "4.x",
+    "express-jwt": "7.x"
   },
   "bugs": {
     "url": "https://github.com/benrei/express-jwt-scope/issues"
